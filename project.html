@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Class Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border: 2px solid #0b3d91;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #0b3d91;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .inputStyling {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .inputlabel {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .inputBox {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #0b3d91;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .addBtn {
+            background-color: #0b3d91;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .addBtn:hover {
+            background-color: #083472;
+        }
+        .table-container {
+            width: 100%;
+            max-width: 700px;
+            margin-top: 30px;
+            background-color: #ffffff;
+            border: 2px solid #0b3d91;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        h2 {
+            color: #0b3d91;
+            text-align: center;
+            margin-top: 0;
+            font-size: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid #0b3d91;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #333;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #0b3d91;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Student Details</h1>
+    <form onsubmit="event.preventDefault(); saveDataToXML(); loadXMLData();">
+        <div class="inputStyling">
+            <label class="inputlabel">Name:</label>
+            <input class="inputBox" type="text" id="name" required>
+        </div>
+        <div class="inputStyling">
+            <label class="inputlabel">Email:</label>
+            <input class="inputBox" type="email" id="email">
+        </div>
+        <div class="inputStyling">
+            <label class="inputlabel">Phone Number:</label>
+            <input class="inputBox" type="text" id="phone">
+        </div>
+        <div class="inputStyling">
+            <label class="inputlabel">Course:</label>
+            <input class="inputBox" type="text" id="course">
+        </div>
+        <div class="inputStyling">
+            <label class="inputlabel">Grade:</label>
+            <input class="inputBox" type="text" id="Grade">
+        </div>
+        <button type="submit" class="addBtn">Add Details</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <h2>Registered Users</h2>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                
+            </tr>
+            <!-- Table rows will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // XML data structure in memory
+    let xmlData = `<registrations></registrations>`;
+
+    // Function to save form data to XML structure
+    function saveDataToXML() {
+        const name = document.getElementById('name').value; 
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const course = document.getElementById('course').value; 
+        const Grade = document.getElementById('Grade').value;
+
+        if (!name || !email || !phone || !course || !Grade) {
+            alert("Please fill all fields.");
+            return;
+        }
+
+        const newRegistration = `
+        <registration>
+            <name>${name}</name>
+            <email>${email}</email>
+            <phone>${phone}</phone>
+            <course>${course}</course>
+            <Grade>${Grade}</Grade>
+        </registration>`;
+
+        xmlData = xmlData.replace('</registrations>', newRegistration + '</registrations>');
+
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('course').value = '';
+        document.getElementById('Grade').value = '';
+        
+        console.log("Data successfully added to XML structure.");
+    }
+
+    // Function to load XML data and display it in the table
+    function loadXMLData() {
+        console.log("Loading XML data...");
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlData, 'application/xml');
+        const registrations = xmlDoc.getElementsByTagName('registration');
+
+        if (registrations.length === 0) {
+            console.log("No registrations found in XML.");
+            return;
+        }
+
+        const tableBody = document.getElementById('data-table').querySelector('tbody');
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        for (let i = 0; i < registrations.length; i++) {
+            const row = document.createElement('tr');
+            const name = registrations[i].getElementsByTagName('name')[0].textContent;
+            const email = registrations[i].getElementsByTagName('email')[0].textContent;
+            const phone = registrations[i].getElementsByTagName('phone')[0].textContent;
+            const course = registrations[i].getElementsByTagName('course')[0].textContent;
+            const Grade = registrations[i].getElementsByTagName('Grade')[0].textContent;
+
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${email}</td>
+                <td>${phone}</td>
+                <td>${course}</td>
+                <td>${Grade}</td>
+            `;
+            tableBody.appendChild(row);
+        }
+        console.log("Data successfully added to table.");
+    }
+</script>
+
+</body>
+</html>
